@@ -57,7 +57,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
           var top = parseFloat($(this).css('top').replace(/px/i, ''))+$(this).find('div').position().top;
           
           //note this top is the top position relative to window height. we will need to convert to full height
-          var current_h = $('.modal').find('img').height();
+          var current_h = $('.spliceModal').find('img').height();
           var full_h = thumb_wrap.data('fullsize').h;
           top = top*(full_h/current_h);
     console.log(top);
@@ -671,7 +671,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
 
         preview_btn.click(function () {
           var modal = document.createElement('div');
-          $(modal).addClass('modal');
+          $(modal).addClass('spliceModal');
           $('body').append(modal);
           $(modal).on('mousedown', closeModal);
           $(modal).on('mouseup', killDrags);
@@ -724,17 +724,16 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
     function resplice(timestamp){
       var thumb_wrap = $('[data-timestamp="'+timestamp+'"]');
       var blob = thumb_wrap.data('src');
-
       splitCanvas(blob, timestamp);
     }
 
     function closeModal(){
       //resplice on modal close with new redliens
-      var ts = $('.modal').find('.preview_wrap').attr('data-timestamp');
+      var ts = $('.spliceModal').find('.preview_wrap').attr('data-timestamp');
       resplice(ts);
 
       //remove modals when done
-      $('.modal').remove();
+      $('.spliceModal').remove();
     };
     function killDrags(e){
       e.stopPropagation();
