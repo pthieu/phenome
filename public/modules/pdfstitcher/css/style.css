@@ -349,17 +349,17 @@
   margin:auto;
   margin-bottom:2px;
 }
-.pdfstitcher .redline_wrap{
+.spliceModal .redline_wrap{
   position: absolute;
   display: block;
   padding:5px 0 5px 0;
   width: 100%;
 }
-.pdfstitcher .redline{
+.spliceModal .redline{
   background-color:#ff0000;
   height:1px;
 }
-.pdfstitcher .redline:after {
+.spliceModal .redline:after {
   font-family: 'FontAwesome';
   content: "\f062";
   color: red; 
@@ -368,12 +368,12 @@
   top: -19px;
   left: 0;
 }
-.pdfstitcher .redline:before {
+.spliceModal .redline:before {
   font-family: 'FontAwesome';
   content: "\f063";
   color: red; 
   font-size: 20px;
   position: absolute;
-  top: 10px;
+  top: 2px;
   left: 0;
 }
