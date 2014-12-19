@@ -1,0 +1,39 @@
+<section data-ng-controller="CreeperController" class="creeper">
+    <div class='wrapper'>
+      <div class='pane usercontrol'>
+        <div ng-repeat="user in users | orderBy:'toString()' | filter:user"><span>{{user}}</span><span class='removeuser' data-val='{{user}}'>X</span>
+        </div>
+        <form action="">
+          <input type="text" class='useradd-id' pattern='[0-9]+'></input>
+          <button type='submit' class='adduser'>Add</button>
+        </form>
+        <button ng-click="notify()">Notify</button>
+      </div>
+      <div class='pane userwrap'>
+        <div class='keyscan-node' ng-repeat='(key, user) in UserList'>
+          <h3 ng-class="{'true': 'green', 'false':'red'}[user.status]" alt='{{key}}'>{{user.user}}</h3>
+          <h5 class='keyscan-toggle'>Keyscans</h5>
+          <div class='user_keyscans-wrapper'>
+            <table class='user_keyscans'>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Location</th>
+                  <th>IO</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat='scan in user.scans | reverse' ng-show='$index-1<15'>
+                  <td>{{scan.Date}}</td>
+                  <td>{{scan.Time}}</td>
+                  <td>{{user.scans[user.scans.length-1-$index].Location}}</td>
+                  <td>{{(scan.IsIn)?"In":"Out"}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
