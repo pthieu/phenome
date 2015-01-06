@@ -285,28 +285,28 @@ angular.module('creeper').config(['$stateProvider',
 
 angular.module('creeper').controller('CreeperController', ['$scope',
   function($scope) {
-    if (Notification.permission !== 'granted'){
-      Notification.requestPermission(function (p) {
-      });
-    }
+    // if (Notification.permission !== 'granted'){
+    //   Notification.requestPermission(function (p) {
+    //   });
+    // }
     
-    $scope.notify = function() {
-      console.log('notifying');
-      var title = 'hi';
-      var options = {
-        'body': 'there',
-      };
-      var n = new Notification(title, options);
-      n.onclick = function (e) {
-        window.focus();
-        //'this' is Notification
-      };
-      n.onshow = function(e){
-        setTimeout(function () {
-          this.close();
-        }, 1000);
-      };
-    };
+    // $scope.notify = function() {
+    //   console.log('notifying');
+    //   var title = 'hi';
+    //   var options = {
+    //     'body': 'there',
+    //   };
+    //   var n = new Notification(title, options);
+    //   n.onclick = function (e) {
+    //     window.focus();
+    //     //'this' is Notification
+    //   };
+    //   n.onshow = function(e){
+    //     setTimeout(function () {
+    //       this.close();
+    //     }, 1000);
+    //   };
+    // };
 
     $scope.UserList = {};
     $scope.users = [];
@@ -316,8 +316,8 @@ angular.module('creeper').controller('CreeperController', ['$scope',
     //document ready
 
     //http://genome.klick.com/api/Ticket/?ForAutocompleter=true&ForGrid=true
-    d = new Date();
-    d_q = new Date();
+    var d = new Date();
+    var d_q = new Date();
     d_q.setDate(d_q.getDate() - 1); //set 1 day back
     var monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'
@@ -326,6 +326,9 @@ angular.module('creeper').controller('CreeperController', ['$scope',
     // localStorage.setItem("userlist", JSON.stringify(['5202','3669','3424','5237','5233','5235','5234','4819']));
     //parse back out into array
     var userlist = JSON.parse(localStorage.getItem('userlist'));
+    if (!userlist){
+      userlist = [];
+    }
     $scope.users = userlist;
     var keyscan_timeout;
     var tickets_timeout;
@@ -338,9 +341,9 @@ angular.module('creeper').controller('CreeperController', ['$scope',
           url: getURL,
           dataType: 'jsonp',
         }).done(parseKeyscans);
-      };
+      }
       // keyscan_timeout = setTimeout(getKeyscans, 60000);
-    };
+    }
 
     function parseKeyscans(data) {
       // console.log('Got entries for: '+data.Entries[0].FullName+" "+data.Entries[0].UserID);
@@ -368,7 +371,7 @@ angular.module('creeper').controller('CreeperController', ['$scope',
         };
         // }
       }
-    };
+    }
 
     function getTickets() {
       var getURL = 'http://genome.klick.com/api/Ticket/?ForAutocompleter=true&ForGrid=true';
@@ -379,7 +382,7 @@ angular.module('creeper').controller('CreeperController', ['$scope',
         console.table(data.Entries);
         $scope.TicketList = data.Entries;
       });
-    };
+    }
 
     getKeyscans();
     // getTickets();
@@ -388,34 +391,34 @@ angular.module('creeper').controller('CreeperController', ['$scope',
       $scope.$apply();
     }, 1000);
     setInterval(function() {
-      localStorage.setItem("userlist", JSON.stringify(userlist));
+      localStorage.setItem('userlist', JSON.stringify(userlist));
     }, 60000);
 
     $('.adduser').click(function() {
-      var patt = new RegExp("[0-9]");
+      var patt = new RegExp('[0-9]');
       var id_input = $('.pane.usercontrol .useradd-id').val();
       if (patt.test(id_input) && parseInt(id_input) >= 3420) {
         userlist.push(id_input);
         $('.pane.usercontrol .useradd-id').val('');
-        localStorage.setItem("userlist", JSON.stringify(userlist));
+        localStorage.setItem('userlist', JSON.stringify(userlist));
         getKeyscans();
       } else {
         alert('Please provide a proper Employee ID');
       }
     });
 
-    $('.pane.usercontrol').on("click", ".removeuser", function() {
+    $('.pane.usercontrol').on('click', '.removeuser', function() {
       var userid = $(this).attr('data-val');
       var index = $scope.users.indexOf(userid);
       $scope.users.splice(index, 1);
       delete $scope.UserList[userid];
       $scope.$apply();
-      localStorage.setItem("userlist", JSON.stringify(userlist));
+      localStorage.setItem('userlist', JSON.stringify(userlist));
     });
     $('.pane.userwrap').on('click', '.keyscan-toggle', function() {
       $(this).next('.user_keyscans-wrapper').slideToggle('fast');
     });
-  };
+  }
 ]);
 'use strict';
 
