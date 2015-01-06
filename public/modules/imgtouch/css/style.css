@@ -1,0 +1,11 @@
+.imgtouch .fa-cloud-upload {
+  display: block;
+  font-size: 100px;
+}
+.imgtouch .blueborder {
+  border: 2px solid #565773;
+  color: #565773;
+}
+.imgtouch .blueborder .fa-cloud-upload {
+  color: #565773;
+}

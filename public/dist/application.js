@@ -53,6 +53,11 @@ ApplicationConfiguration.registerModule('creeper');
 'use strict';
 
 // Use application configuration module to register a new module
+ApplicationConfiguration.registerModule('imgtouch');
+
+'use strict';
+
+// Use application configuration module to register a new module
 ApplicationConfiguration.registerModule('pdfstitcher');
 
 'use strict';
@@ -433,6 +438,27 @@ angular.module('creeper').filter('reverse', function() {
      	return items.slice().reverse();
     };
 });
+'use strict';
+
+//Setting up route
+angular.module('imgtouch').config(['$stateProvider',
+	function($stateProvider) {
+		// Imgtouch state routing
+		$stateProvider.
+		state('imgtouch', {
+			url: '/imgtouch',
+			templateUrl: 'modules/imgtouch/views/imgtouch.client.view.html'
+		});
+	}
+]);
+'use strict';
+
+angular.module('imgtouch').controller('ImgtouchController', ['$scope',
+	function($scope) {
+		// Controller Logic
+		// ...
+	}
+]);
 'use strict';
 
 //Setting up route
