@@ -9,3 +9,8 @@
 .imgtouch .blueborder .fa-cloud-upload {
   color: #565773;
 }
+
+.imgtouch .img-wrap{
+  display:inline-block;
+  width:300px;
+}

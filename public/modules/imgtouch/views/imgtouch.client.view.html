@@ -1,13 +1,17 @@
 <section data-ng-controller="ImgtouchController" class="imgtouch">
   <h1>Phong's Image Toucher</h1>
-  <div class="step2">
+  <div class="container">
     <file-upload data-img-list="imgList"></file-upload>
+    <input ng-model="topbuffer" ng-init="topbuffer=100" ng-pattern="/^\d+$/">
     <div class="results_wrap">
       <h2>Screenshot List:</h2>
       <button ng-click="downloadAll(imgList)">Download All</button>
+      <!-- <canvas id="canvas"></canvas> -->
       <div class="row">
-        <div class="col-md-3">
-          <img ng-repeat="img in imgList track by $index" ng-src="{{img}}"></div>
+        <div class="col-xs-12">
+          <div class="img-wrap" ng-repeat="img in imgList track by $index">
+            <img class="img-responsive"  ng-src="{{img}}">
+          </div>
         </div>
       </div>
     </div>
