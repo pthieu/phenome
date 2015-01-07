@@ -33,16 +33,23 @@ angular.module('imgtouch').controller('ImgtouchController', ['$scope',
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
 
+        // NOTE THAT BELOW WAS OLD LOGIC
         // Resize the canvas to the size of the image
-        canvas.width = img.width;
-        canvas.height = img.height + parseInt($scope.topbuffer.h || 0);
-        // If there is buffer pixels specified, we add it
-        ctx.rect(0, 0, img.width, $scope.topbuffer.h || 0);
-        ctx.fillStyle = 'black';
-        ctx.fill();
-        // Fill image in after top buffer has been placed
-        ctx.drawImage(img, 0, $scope.topbuffer.h || 0); // Or at whatever offset you like
+        // canvas.width = img.width;
+        // canvas.height = img.height + parseInt($scope.topbuffer.h || 0);
+        // // If there is buffer pixels specified, we add it
+        // ctx.rect(0, 0, img.width, $scope.topbuffer.h || 0);
+        // ctx.fillStyle = 'black';
+        // ctx.fill();
+        // // Fill image in after top buffer has been placed
+        // ctx.drawImage(img, 0, $scope.topbuffer.h || 0); // Or at whatever offset you like
+        // END OLD LOGIC
 
+        canvas.width = img.width;
+        canvas.height = img.height;
+        // Fill image in after top buffer has been placed
+        ctx.drawImage(img, 0, 0); // Or at whatever offset you like
+        canvas = splitImage(canvas, $scope.topbuffer.y, $scope.topbuffer.h);
         // Create temporary anchor element, bind src, download and remove
         var theAnchor = $('<a />')
           .attr('href', canvas.toDataURL())
@@ -62,6 +69,40 @@ angular.module('imgtouch').controller('ImgtouchController', ['$scope',
       // Increment the depth and go deeper into the recursive algorithm
       $scope.downloadDepth++;
       handleDownloadAll(files); // WE MUST GO DEEPER
+    }
+
+    function splitImage(_canvas, _y, _h) {
+      // NOTE: THIS ISN'T DOING ANY CHECKS ON PARAMETERS PASSED IN. COULD BREAK IF _y or _h GREATER THAN HEIGHT OF _canvas/canvas
+
+      // Assuming just one split, two parts
+      // Create new canvas with new height, we are going to return this one after making modifications
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('2d');
+      // Height of modified canvas is old canvas plus the amount of pixels we're adding
+      canvas.height = _canvas.height + _h;
+      canvas.width = _canvas.width;
+      // Paint top part of old canvas old canvas onto new canvas
+      // drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
+      // img: can be image object or other canvas
+      // sx/sy: starting x/y positions to clip from source
+      // swidth/sheight: w/h to clip from starting location
+      // x/y: starting location of destination canvas
+      // width/height: where to copy clipped src to, will stretch or shrink src
+
+      // Clip out top part of old canvas, draw it on new one
+      ctx.drawImage(_canvas, 0, 0, _canvas.width, _y, 0, 0, canvas.width, _y);
+      // Clip out bottom part of canvas, drop it on new one a specific _h away from top part
+      // Clip clip whole width of old canvas(sx=0, swidth=_canvas.width), clip height from start of cut to end (sy=_y, sheight=_canvas.height-_y), note that old canvas doesn't have added pixels
+      // Copy to new canvas's location after added pixels (x=0, y=_y+_h), copy to whole width of new canvas(width=canvas.width, height=_canvas.height-_y)
+      ctx.drawImage(_canvas, 0, _y, _canvas.width, _canvas.height - _y, 0, _y + _h, canvas.width, _canvas.height - _y);
+
+      // Add the buffer pixels to the proper section
+      ctx.rect(0, _y, canvas.width, _h);
+      ctx.fillStyle = 'black';
+      ctx.fill();
+
+      // Return the new canvas so that we can download it
+      return canvas;
     }
   }
 ]);

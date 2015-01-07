@@ -5,19 +5,26 @@
     <!-- <div>
       <label>Rename:</label> <input ng-model="file.rename" ng-init="file.rename = 'file'" ng-pattern="/^\w+$/">
     </div> -->
-    <div>
-      <label>Position from top:</label> <input ng-model="topbuffer.x" ng-init="topbuffer.x = 0" ng-pattern="/^\d+$/">
+    <div class="row">
+      <div class="col-xs-4">
+        <div class="row right">
+          <label>Position from top:</label>
+          <input type="number" ng-model="topbuffer.y" ng-init="topbuffer.y = 400" ng-pattern="/^\d+$/">
+        </div>
+        <div class="row right">
+          <label>Height to add:</label>
+          <input type="number" ng-model="topbuffer.h" ng-init="topbuffer.h = 200" ng-pattern="/^\d+$/">
+        </div>
+      </div>
     </div>
-    <div>
-      <label>Height to add:</label> <input ng-model="topbuffer.h" ng-init="topbuffer.h = 0" ng-pattern="/^\d+$/">
-    </div>
-    <div class="results_wrap">
+    <div class="row results_wrap">
       <h2>Screenshot List:</h2>
       <button ng-click="downloadAll(imgList)">Download All</button>
       <div class="row">
         <div class="col-xs-12">
           <div class="img-wrap" ng-repeat="img in imgList track by $index">
-            <img class="img-responsive"  ng-src="{{img.src}}">
+            <!-- <img class="img-responsive" ng-src="{{img.src}}"> -->
+            <span>{{img.name + '.' + img.extension}}</span>
           </div>
         </div>
       </div>
