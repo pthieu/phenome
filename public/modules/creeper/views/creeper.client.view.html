@@ -4,10 +4,11 @@
         <div ng-repeat="user in users | orderBy:'toString()' | filter:user"><span>{{user}}</span><span class='removeuser' data-val='{{user}}'>X</span>
         </div>
         <form action="">
+          <h5>Add a Genome ID</h5>
           <input type="text" class='useradd-id' pattern='[0-9]+'></input>
           <button type='submit' class='adduser'>Add</button>
         </form>
-        <button ng-click="notify()">Notify</button>
+        <!-- <button ng-click="notify()">Notify</button> -->
       </div>
       <div class='pane userwrap'>
         <div class='keyscan-node' ng-repeat='(key, user) in UserList'>
