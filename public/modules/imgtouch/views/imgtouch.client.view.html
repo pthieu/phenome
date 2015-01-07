@@ -4,9 +4,10 @@
     <file-upload data-img-list="imgList"></file-upload>
     <div class="results_wrap">
       <h2>Screenshot List:</h2>
+      <button ng-click="downloadAll(imgList)">Download All</button>
       <div class="row">
         <div class="col-md-3">
-          <img ng-repeat="img in imgList" ng-src="{{img}}"></div>
+          <img ng-repeat="img in imgList track by $index" ng-src="{{img}}"></div>
         </div>
       </div>
     </div>

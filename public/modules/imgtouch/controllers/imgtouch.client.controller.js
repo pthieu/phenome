@@ -6,7 +6,20 @@ angular.module('imgtouch').controller('ImgtouchController', ['$scope',
   function($scope) {
     // Controller Logic
     // setInterval(function () {
-      // console.log($scope.imgList);
+    // console.log($scope.imgList);
     // },1000);
+
+    $scope.downloadAll = function(files) {
+      /*global $*/ // This tells jshint that we assume jquery to exist
+
+      if (files.length === 0) return;
+      var file = files.pop();
+      var theAnchor = $('<a />')
+        .attr('href', file)
+        .attr('download', 'file'+files.length);
+      theAnchor[0].click();
+      theAnchor.remove();
+      $scope.downloadAll(files);
+    };
   }
 ]);
