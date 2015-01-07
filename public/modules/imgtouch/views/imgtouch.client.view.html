@@ -2,7 +2,7 @@
   <h1>Phong's Image Toucher</h1>
   <div class="container">
     <file-upload data-img-list="imgList"></file-upload>
-    <input ng-model="topbuffer" ng-init="topbuffer=100" ng-pattern="/^\d+$/">
+    <label>Top Buffer:</label> <input ng-model="topbuffer" ng-init="topbuffer = 0" ng-pattern="/^\d+$/">
     <div class="results_wrap">
       <h2>Screenshot List:</h2>
       <button ng-click="downloadAll(imgList)">Download All</button>
