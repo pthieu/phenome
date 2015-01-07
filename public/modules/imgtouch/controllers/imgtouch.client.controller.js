@@ -35,18 +35,19 @@ angular.module('imgtouch').controller('ImgtouchController', ['$scope',
 
         // Resize the canvas to the size of the image
         canvas.width = img.width;
-        canvas.height = img.height + parseInt($scope.topbuffer || 0);
+        canvas.height = img.height + parseInt($scope.topbuffer.h || 0);
         // If there is buffer pixels specified, we add it
-        ctx.rect(0, 0, img.width, $scope.topbuffer || 0);
+        ctx.rect(0, 0, img.width, $scope.topbuffer.h || 0);
         ctx.fillStyle = 'black';
         ctx.fill();
         // Fill image in after top buffer has been placed
-        ctx.drawImage(img, 0, $scope.topbuffer || 0); // Or at whatever offset you like
+        ctx.drawImage(img, 0, $scope.topbuffer.h || 0); // Or at whatever offset you like
 
         // Create temporary anchor element, bind src, download and remove
         var theAnchor = $('<a />')
           .attr('href', canvas.toDataURL())
-          .attr('download', 'file' + img.depth);
+          // .attr('download', (img.name || 'file') + img.depth);
+          .attr('download', (img.name || 'file') + '_touched.' + img.extension);
         theAnchor[0].click();
         theAnchor.remove();
       };
@@ -54,7 +55,9 @@ angular.module('imgtouch').controller('ImgtouchController', ['$scope',
       // so we need a way to refer to it when it actually loads.
       img.depth = $scope.downloadDepth;
       // Load the file
-      img.src = file;
+      img.name = file.name;
+      img.extension = file.extension;
+      img.src = file.src;
 
       // Increment the depth and go deeper into the recursive algorithm
       $scope.downloadDepth++;

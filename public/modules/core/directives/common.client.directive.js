@@ -45,7 +45,7 @@ angular.module('core').directive('fileUpload', [
                 // Convert src to window URL
                 // file['src'] = window.URL.createObjectURL(filesRAW[i]);
                 // Push the byte src into imgList variable, which is linked to the imgList variable outside of the fileUpload directive
-                $scope.imgList.push(e.target.result);
+                $scope.imgList.push({'name': f.name, 'extension':f.extension, 'src':e.target.result});
                 $scope.$apply();
                 // f['size'] = getImageSize(f.url);
 
@@ -138,7 +138,8 @@ angular.module('core').directive('fileUpload', [
             var reader = new FileReader();
             var file = {};
 
-            // file['name'] = filesRAW[i].name;
+            file.name = filesRAW[i].name.substr(0, filesRAW[i].name.lastIndexOf('.')) || filesRAW[i].name;
+            file.extension = filesRAW[i].type.replace(/image\//,'');
             // file['type'] = filesRAW[i].type;
             // file['src'] = window.URL.createObjectURL(filesRAW[i]);
 

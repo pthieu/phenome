@@ -2,15 +2,22 @@
   <h1>Phong's Image Toucher</h1>
   <div class="container">
     <file-upload data-img-list="imgList"></file-upload>
-    <label>Top Buffer:</label> <input ng-model="topbuffer" ng-init="topbuffer = 0" ng-pattern="/^\d+$/">
+    <!-- <div>
+      <label>Rename:</label> <input ng-model="file.rename" ng-init="file.rename = 'file'" ng-pattern="/^\w+$/">
+    </div> -->
+    <div>
+      <label>Position from top:</label> <input ng-model="topbuffer.x" ng-init="topbuffer.x = 0" ng-pattern="/^\d+$/">
+    </div>
+    <div>
+      <label>Height to add:</label> <input ng-model="topbuffer.h" ng-init="topbuffer.h = 0" ng-pattern="/^\d+$/">
+    </div>
     <div class="results_wrap">
       <h2>Screenshot List:</h2>
       <button ng-click="downloadAll(imgList)">Download All</button>
-      <!-- <canvas id="canvas"></canvas> -->
       <div class="row">
         <div class="col-xs-12">
           <div class="img-wrap" ng-repeat="img in imgList track by $index">
-            <img class="img-responsive"  ng-src="{{img}}">
+            <img class="img-responsive"  ng-src="{{img.src}}">
           </div>
         </div>
       </div>
