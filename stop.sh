@@ -1,0 +1,1 @@
+forever stop ~/www/phenome/app.js
