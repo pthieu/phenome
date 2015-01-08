@@ -1,7 +1,8 @@
 #!/bin/bash
 
 
-#Invoke the Forever module (to START our Node.js server).
+# Invoke the Forever module (to START our Node.js server).
+# NOTE: if log folder doesn't exist, this script will break, TODO: add folder check and if not exist, create
 NODE_ENV=production \
 forever \
 start \

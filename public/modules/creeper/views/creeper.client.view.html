@@ -4,7 +4,8 @@
         <div ng-repeat="user in users | orderBy:'toString()' | filter:user"><span>{{user}}</span><span class='removeuser' data-val='{{user}}'>X</span>
         </div>
         <form action="">
-          <h5>Add a Genome ID</h5>
+          <h5>Add a Genome ID to track people</h5>
+          <h5 class="italic">Note: you must be able to access genome.klick.com on the browser you're view this one for this tool to work</h5>
           <input type="text" class='useradd-id' pattern='[0-9]+'></input>
           <button type='submit' class='adduser'>Add</button>
         </form>
