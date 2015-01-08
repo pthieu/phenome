@@ -1,3 +1,8 @@
+'use strict';
+/*globals $, jQuery*/
+/*globals PDFDocument, blobStream*/
+/*globals dragSrcEl:true, dragSrcElmargins:true*/
+
 angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
   function($scope) {
     var files = [];
@@ -9,32 +14,34 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
     (function($) {
       $.fn.drags = function(opt) {
         //jquery options
-        opt = $.extend({handle:"",cursor:"move"}, opt);
+        opt = $.extend({handle:'',cursor:'move'}, opt);
 
-        if(opt.handle === "") {
-            var el = this;
+        var el;
+        if(opt.handle === '') {
+            el = this;
         } else {
-            var el = this.find(opt.handle);
+            el = this.find(opt.handle);
         }
         //return element after we do stuff with it so we can chain other functions
-        return el.css('cursor', opt.cursor).on("mousedown", function(e) {
-          if(opt.handle === "") {
-              var drag = $(this).addClass('draggable');
+        return el.css('cursor', opt.cursor).on('mousedown', function(e) {
+          var drag;
+          if(opt.handle === '') {
+              drag = $(this).addClass('draggable');
           }
           else {
-              var drag = $(this).addClass('active-handle').parent().addClass('draggable');
+              drag = $(this).addClass('active-handle').parent().addClass('draggable');
           }
           //set up mouse location so it doesn't pop when we drag
           var z_idx = drag.css('z-index');
           var drg_h = drag.outerHeight();
           var pos_y = drag.offset().top + drg_h - e.pageY;
 
-          drag.css('z-index', 1000).parents().on("mousemove", function(e) {
+          drag.css('z-index', 1000).parents().on('mousemove', function(e) {
             e.stopPropagation();
             //can use .draggable because only one when mousedown
             $('.draggable').offset({
                 top:e.pageY + pos_y - drg_h,
-            }).on("mouseup", function(e) {
+            }).on('mouseup', function(e) {
                 e.stopPropagation();
                 $(this).removeClass('draggable').css('z-index', z_idx);
             });
@@ -42,7 +49,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
           e.stopPropagation();
           e.preventDefault(); // disable selection
         })
-        .on("mouseup", function(e) {
+        .on('mouseup', function(e) {
           //this is the final mouseup
           e.stopPropagation();
 
@@ -64,7 +71,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
           //this splice will affect memory for thumb wrap
           splice[order] = top;
 
-          if(opt.handle === "") {
+          if(opt.handle === '') {
               $('.draggable').removeClass('draggable');
           } else {
               $('.draggable').removeClass('active-handle').parent().removeClass('draggable');
@@ -75,7 +82,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
     //            setTimeout(function (e) {
     //            }, 50000);
             // });
-      }
+      };
     //this passes in the jquery object so it can be chainable
     })(jQuery);
 
@@ -83,14 +90,14 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
     function handleDragOver(e) {
       e.stopPropagation();
       e.preventDefault();
-      $(this).addClass('blueborder');
+      $(e.currentTarget).addClass('blueborder');
       e.dataTransfer.dropEffect = 'copy'; // Explicitly show this isrt('test')
     }
 
     function handleDragLeave(e) {
       e.stopPropagation();
       e.preventDefault();
-      $(this).removeClass('blueborder');
+      $(e.currentTarget).removeClass('blueborder');
     }
 
     function handleFileDrop(e) {
@@ -103,14 +110,16 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
 
       if (!!e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
 
-      $(this).removeClass('blueborder');
+      $(e.currentTarget).removeClass('blueborder');
+
+      var filesRAW;
       if (!!e.dataTransfer) {
         //if drag and drop
-        var filesRAW = e.dataTransfer.files;
+        filesRAW = e.dataTransfer.files;
       }
       else {
         //if click and select
-        var filesRAW = e.target.files;
+        filesRAW = e.target.files;
       }
 
       for (var i = 0; i < filesRAW.length; i++) {
@@ -121,9 +130,9 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
         var reader = new FileReader();
         var file = {};
 
-        file['name'] = filesRAW[i].name;
-        file['type'] = filesRAW[i].type;
-        file['src'] = window.URL.createObjectURL(filesRAW[i]);
+        file.name = filesRAW[i].name;
+        file.type = filesRAW[i].type;
+        file.src = window.URL.createObjectURL(filesRAW[i]);
 
         reader.onloadend = (function(f) {
           //we return an object because we want variable file to be in the scope of the function (as variable f)
@@ -131,71 +140,71 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
             // docDefinition = {content:[{image: e.target.result,width: 150, height: 150}]}
             // pdfMake.createPdf(docDefinition).download('test.pdf')
             //we also want variable e to be the input parameter from ouput of readAsDataURL
-            f['url'] = e.target.result;
-            f['size'] = getImageSize(f.url);
+            f.url = e.target.result;
+            f.size = getImageSize(f.url);
 
             var fullsize = JSON.stringify({'w':f.size.width, 'h':f.size.height});
             var imgRatio = calcRatio(f.size.width, f.size.height);
             if (!imgRatio) return;
 
-            f['crop'] = imgRatio[0]; //number of screens there are (number rounded up)
-            f['max_h'] = imgRatio[1]; //max height screen can be (includes margins)
+            f.crop = imgRatio[0]; //number of screens there are (number rounded up)
+            f.max_h = imgRatio[1]; //max height screen can be (includes margins)
             //preview
             var config_screen = [
-                "<div class='fileinfo'>" + f.name + "</div>",
-                "<div class='config_screen'>",
+                '<div class=\'fileinfo\'>' + f.name + '</div>',
+                '<div class=\'config_screen\'>',
                   // "<div class='opt_wrap remove'>",
                   //   "<button title='Remove from PDF'><i class='fa fa-times'></i></button>",
                   //   "<span>Remove</span>",
                   // "</div>",
-                  "<div class='opt_wrap margin_btn'>",
-                    "<button title='Set custom margins'><i class='fa fa-arrows-alt'></i></button>",
-                    "<span>Margins</span>",
-                  "</div>",
-                  "<div class='opt_wrap preview'>",
-                    "<button title='Splice image by dragging red lines'><i class='fa fa-search-plus'></i></button>",
-                    "<span>Splicer</span>",
-                  "</div>",
-                  "<div class='margins_wrap hidden'>",
-                    "<div class='margins'>",
-                      "<div class='margin msg'>",
-                        "<span style='font-style:italic'>Close menu to drag again</span>",
-                      "</div>",
-                      "<div class='margin msg'>",
-                        "<span style='font-style:italic'>(Units in inches)</span>",
-                      "</div>",
-                      "<div class='margin'>",
-                        "<label>Top:</label><input class='top' />",
-                      "</div>",
-                      "<div class='margin hidden'>",
-                        "<label>Bottom:</label><input class='bottom' />",
-                      "</div>",
-                      "<div class='margin'>",
-                        "<label>Left:</label><input class='left' />",
-                      "</div>",
-                      "<div class='margin'>",
-                        "<label>Right:</label><input class='right' />",
-                      "</div>",
-                      "<div class='margin msg'>",
-                        "<span style='font-style:italic'>Input numbers only!</span>",
-                      "</div>",
-                      "<div class='margin'>",
-                        "<button class='resplice_btn'>Re-splice</button>",
-                      "</div>",
-                    "</div>",
-                  "</div>",
-                "</div>"
+                  '<div class=\'opt_wrap margin_btn\'>',
+                    '<button title=\'Set custom margins\'><i class=\'fa fa-arrows-alt\'></i></button>',
+                    '<span>Margins</span>',
+                  '</div>',
+                  '<div class=\'opt_wrap preview\'>',
+                    '<button title=\'Splice image by dragging red lines\'><i class=\'fa fa-search-plus\'></i></button>',
+                    '<span>Splicer</span>',
+                  '</div>',
+                  '<div class=\'margins_wrap hidden\'>',
+                    '<div class=\'margins\'>',
+                      '<div class=\'margin msg\'>',
+                        '<span style=\'font-style:italic\'>Close menu to drag again</span>',
+                      '</div>',
+                      '<div class=\'margin msg\'>',
+                        '<span style=\'font-style:italic\'>(Units in inches)</span>',
+                      '</div>',
+                      '<div class=\'margin\'>',
+                        '<label>Top:</label><input class=\'top\' />',
+                      '</div>',
+                      '<div class=\'margin hidden\'>',
+                        '<label>Bottom:</label><input class=\'bottom\' />',
+                      '</div>',
+                      '<div class=\'margin\'>',
+                        '<label>Left:</label><input class=\'left\' />',
+                      '</div>',
+                      '<div class=\'margin\'>',
+                        '<label>Right:</label><input class=\'right\' />',
+                      '</div>',
+                      '<div class=\'margin msg\'>',
+                        '<span style=\'font-style:italic\'>Input numbers only!</span>',
+                      '</div>',
+                      '<div class=\'margin\'>',
+                        '<button class=\'resplice_btn\'>Re-splice</button>',
+                      '</div>',
+                    '</div>',
+                  '</div>',
+                '</div>'
               ].join('');
             // if (f.crop > 1) {
               var timestamp = (new Date()).getTime(); //use time stamp to get unique group identifier
               //write to canvas and split into however many sections
               splitCanvas(e.target.result, timestamp);
               //splitCanvas has async calls so we have to add a div group skeleton and fill it up later
-              var addIMG = ["<div class='thumb_wrap crop_group ", timestamp,
-                              "' data-src='"+f.src
-                              +"' data-fullsize='"+fullsize
-                              +"' data-timestamp='"+timestamp+"'><div draggable='true' class='drag_overlay'></div>",
-                              config_screen, "</div>"].join('');
+              var addIMG = ['<div class=\'thumb_wrap crop_group ', timestamp,
+                              '\' data-src=\''+f.src +
+                              '\' data-fullsize=\''+fullsize +
+                              '\' data-timestamp=\''+timestamp+'\'><div draggable=\'true\' class=\'drag_overlay\'></div>',
+                              config_screen, '</div>'].join('');
             // }
             // else {
             //   //append image to div -- single page no crop isn't an async call so just add it
@@ -218,7 +227,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
       e.stopPropagation();
       e.preventDefault();
       e.dataTransfer.dropEffect = 'copy';
-      $(this).removeClass('blueborder');
+      $(e.currentTarget).removeClass('blueborder');
 
       var filesRAW = e.dataTransfer.files;
 
@@ -236,7 +245,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
           //   window.URL.revokeObjectURL(this.src);
           // }
 
-          var addIMG = ["<div class='thumb_wrap'><div class='thumb_crop'><span><img src='", window.URL.createObjectURL(filesRAW[i]), "' class='thumb' /></span></div></div>"].join('');
+          var addIMG = ['<div class=\'thumb_wrap\'><div class=\'thumb_crop\'><span><img src=\'', window.URL.createObjectURL(filesRAW[i]), '\' class=\'thumb\' /></span></div></div>'].join('');
           $('#list').append(addIMG);
           // info.innerHTML = filesRAW[i].name + ": " + filesRAW[i].size + " bytes";
         }
@@ -244,7 +253,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
     }
 
     function getImageSize(src) {
-      var img = new Image;
+      var img = new Image();
       img.src = src;
 
       var size = {
@@ -260,9 +269,9 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
       //handle setsize, make it disappear
       $('button.setsize').addClass('hidden');
       //disable inputs in global config
-      $('.config_global input').attr('disabled', 'disabled')
-      $('.config_global input').addClass('disabled')
-      $('.config_global h2').addClass('hidden')
+      $('.config_global input').attr('disabled', 'disabled');
+      $('.config_global input').addClass('disabled');
+      $('.config_global h2').addClass('hidden');
       //show dropzone area
       $('.step2 .dropzone.hidden').removeClass('hidden');
       
@@ -272,23 +281,23 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
 
 
     //this is testing pdfmake -- NOTUSED
-    function makePDF2() {
-      var pdf_w = $('.pdf_w').val();
-      var pdf_h = $('.pdf_h').val();
+    // function makePDF2() {
+    //   var pdf_w = $('.pdf_w').val();
+    //   var pdf_h = $('.pdf_h').val();
 
-      var items = $('.thumb');
-      docDefinition['pageSize'] = 'A4';
+    //   var items = $('.thumb');
+    //   docDefinition['pageSize'] = 'A4';
 
-      items.each(function(i, e) {
-        var imgData = e.src;
-        docDefinition['content'].push({
-          image: e.src,
-          width: 210,
-          pageBreak: 'after'
-        });
-      });
-      pdfMake.createPdf(docDefinition).download('test.pdf')
-    }
+    //   items.each(function(i, e) {
+    //     var imgData = e.src;
+    //     docDefinition['content'].push({
+    //       image: e.src,
+    //       width: 210,
+    //       pageBreak: 'after'
+    //     });
+    //   });
+    //   pdfMake.createPdf(docDefinition).download('test.pdf');
+    // }
 
     //this is testing pdfkit
     function makekit() {
@@ -325,10 +334,10 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
         var parent = $(this).parents('.thumb_wrap');
 
         // check individual margins
-        var top     = (parent.find('.top').val() === "0")?0:parent.find('.top').val()*72 || pdf_t;
-        var bottom  = (parent.find('.bottom').val() === "0")?0:parent.find('.bottom').val()*72  || pdf_b;
-        var left    = (parent.find('.left').val() === "0")?0:parent.find('.left').val()*72    || pdf_l;
-        var right   = (parent.find('.right').val() === "0")?0:parent.find('.right').val()*72   || pdf_r;
+        var top     = (parent.find('.top').val() === '0')?0:parent.find('.top').val()*72 || pdf_t;
+        var bottom  = (parent.find('.bottom').val() === '0')?0:parent.find('.bottom').val()*72  || pdf_b;
+        var left    = (parent.find('.left').val() === '0')?0:parent.find('.left').val()*72    || pdf_l;
+        var right   = (parent.find('.right').val() === '0')?0:parent.find('.right').val()*72   || pdf_r;
         // top     = (!!top)     ? mmToin(top, true)     : 12.7;
         // bottom  = (!!bottom)  ? mmToin(bottom, true)  : 12.7;
         // left    = (!!left)    ? mmToin(left, true)    : 25.4;
@@ -355,36 +364,36 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
     }
 
     //this is testing jsPDF -- NOTUSED
-    function makePDF() {
-      var pdf_w = $('.pdf_w').val();
-      var pdf_h = $('.pdf_h').val();
+    // function makePDF() {
+    //   var pdf_w = $('.pdf_w').val();
+    //   var pdf_h = $('.pdf_h').val();
 
-      var items = $('.thumb');
-      pdf = new jsPDF((pdf_w > pdf_h) ? 'l' : 'p', 'in', [pdf_w, pdf_h]); //p:portrait, in:inches,[h,w] //l:landscape, mm:millimeter, [w,h]
+    //   var items = $('.thumb');
+    //   pdf = new jsPDF((pdf_w > pdf_h) ? 'l' : 'p', 'in', [pdf_w, pdf_h]); //p:portrait, in:inches,[h,w] //l:landscape, mm:millimeter, [w,h]
 
-      items.each(function(i, e) {
-        // var img = new Image;
-        // img.src = e.src;
-        // console.log(['w:', img.width, 'h:', img.height].join(' '));
-        var imgData = e.src;
-        // var doc = new jsPDF('p', 'in', [pdf_w, pdf_h]); //p:portrait, in:inches,[w,h] //l:landscape, mm:millimeter, [w,h]
+    //   items.each(function(i, e) {
+    //     // var img = new Image;
+    //     // img.src = e.src;
+    //     // console.log(['w:', img.width, 'h:', img.height].join(' '));
+    //     var imgData = e.src;
+    //     // var doc = new jsPDF('p', 'in', [pdf_w, pdf_h]); //p:portrait, in:inches,[w,h] //l:landscape, mm:millimeter, [w,h]
 
-        if (pdf_page > 0) {
-          pdf.addPage();
-        }
-        // pdf.addImage(imgData, 'JPEG', 0, 0, pdf_w, (img.height < calcRatio(img.width, img.height)[1])?(img.height/img.width*pdf_w):pdf_h);
-        pdf.addImage(imgData, 'png', 0, 0, pdf_w, pdf_h);
-        pdf_page++;
-        // delete img;
-      });
-      savePDF();
-      pdf_page = 0; //reset
-    }
+    //     if (pdf_page > 0) {
+    //       pdf.addPage();
+    //     }
+    //     // pdf.addImage(imgData, 'JPEG', 0, 0, pdf_w, (img.height < calcRatio(img.width, img.height)[1])?(img.height/img.width*pdf_w):pdf_h);
+    //     pdf.addImage(imgData, 'png', 0, 0, pdf_w, pdf_h);
+    //     pdf_page++;
+    //     // delete img;
+    //   });
+    //   savePDF();
+    //   pdf_page = 0; //reset
+    // }
 
-    //save function for jsPDF -- NOTUSED
-    function savePDF() {
-      pdf.save('test.pdf');
-    }
+    // //save function for jsPDF -- NOTUSED
+    // function savePDF() {
+    //   pdf.save('test.pdf');
+    // }
 
     function calcRatio(w, h, ele) {
       //default 11x17 -- no need to convert in to mm since we're grabbing ratios and returning pixels
@@ -396,7 +405,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
       var pdf_r = $('.pdf_r').val() || 0;
       //overwrite borders if individual thumb has its own config  
       if(!!ele){
-        thumb_wrap = $('[data-timestamp="'+ele+'"]');
+        var thumb_wrap = $('[data-timestamp="'+ele+'"]');
         pdf_t = thumb_wrap.find('.top').val()     || pdf_t;
         pdf_b = thumb_wrap.find('.bottom').val()  || pdf_b;
         pdf_l = thumb_wrap.find('.left').val()    || pdf_l;
@@ -423,7 +432,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
       }
 
       //create invisible element
-      var canvas = document.createElement("canvas");
+      var canvas = document.createElement('canvas');
       var context = canvas.getContext('2d');
 
       // load image from data url
@@ -458,7 +467,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
 
         //iterate through each piece and take source image and draw onto a temp image
         for (var i = 0; i < crop; i++) {
-          var tmpCanvas = document.createElement("canvas");
+          var tmpCanvas = document.createElement('canvas');
           var tmpContext = tmpCanvas.getContext('2d');
 
           tmpCanvas.width = canvas.width;
@@ -479,7 +488,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
 
           var thumb_wrap = $('[data-timestamp="'+ele+'"]');
           //probably instead of appending, find a way to put it beside thing
-          thumb_wrap.append("<div class='thumb_crop'><div class='opt_wrap remove'><button title='Remove from PDF'><i class='fa fa-times'></i></button></div><div class='bg_cross'></div><span><img src='" + tmpCanvas.toDataURL('image/jpeg') + "' class='thumb' /></span></div>");
+          thumb_wrap.append('<div class=\'thumb_crop\'><div class=\'opt_wrap remove\'><button title=\'Remove from PDF\'><i class=\'fa fa-times\'></i></button></div><div class=\'bg_cross\'></div><span><img src=\'' + tmpCanvas.toDataURL('image/jpeg') + '\' class=\'thumb\' /></span></div>');
           rebindConfig();
         }
 
@@ -499,26 +508,26 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
     //starting a drag
     //for manual entry swap
     function handleThumbSwapStart(e) {
-      $(this).parent('.thumb_wrap').addClass('dragging');
-      dragSrcEl = this;
+      $(e.currentTarget).parent('.thumb_wrap').addClass('dragging');
+      dragSrcEl = e.currentTarget;
 
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/html', this.parentElement.innerHTML);
+      e.dataTransfer.setData('text/html', e.currentTarget.parentElement.innerHTML);
     }
     //src html
     function handleThumbDragStart(e) {
-      $(this).parent('.thumb_wrap').addClass('dragging');
-      dragSrcEl = this;
+      $(e.currentTarget).parent('.thumb_wrap').addClass('dragging');
+      dragSrcEl = e.currentTarget;
 
       dragSrcElmargins = {
-        't': $(this).siblings('.config_screen').find('.margins_wrap .top').val(),
-        'b': $(this).siblings('.config_screen').find('.margins_wrap .bottom').val(),
-        'l': $(this).siblings('.config_screen').find('.margins_wrap .left').val(),
-        'r': $(this).siblings('.config_screen').find('.margins_wrap .right').val()
-      }
+        't': $(e.currentTarget).siblings('.config_screen').find('.margins_wrap .top').val(),
+        'b': $(e.currentTarget).siblings('.config_screen').find('.margins_wrap .bottom').val(),
+        'l': $(e.currentTarget).siblings('.config_screen').find('.margins_wrap .left').val(),
+        'r': $(e.currentTarget).siblings('.config_screen').find('.margins_wrap .right').val()
+      };
 
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/html', this.parentElement.outerHTML);
+      e.dataTransfer.setData('text/html', e.currentTarget.parentElement.outerHTML);
     }
 
     //while over element, will keep triggering as long as held over
@@ -534,42 +543,42 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
     //entering an element, check for element being entered and handle
     function handleThumbDragEnter(e) {
       // this / e.target is the current hover target.
-      $(this).parent('.thumb_wrap').addClass('dragover');
+      $(e.currentTarget).parent('.thumb_wrap').addClass('dragover');
     }
 
     //leaving element, check for element being left
     function handleThumbDragLeave(e) {
-      $(this).parent('.thumb_wrap').removeClass('dragover');
+      $(e.currentTarget).parent('.thumb_wrap').removeClass('dragover');
     }
 
     //triggers if you let go of the mouse ontop of a draggable item
     //for manual entry swap
     function handleThumbSwapDrop(e) {
-      $(this).parent('.thumb_wrap').removeClass('dragover');
+      $(e.currentTarget).parent('.thumb_wrap').removeClass('dragover');
       if (e.stopPropagation) {
         e.stopPropagation(); // Stops some browsers from redirecting.
       }
 
       // Don't do anything if dropping the same column we're dragging.
-      if (dragSrcEl != this) {
+      if (dragSrcEl != e.currentTarget) {
         // Set the source column's HTML to the HTML of the column we dropped on.
-        dragSrcEl.parentElement.innerHTML = this.parentElement.innerHTML;
-        this.parentElement.innerHTML = e.dataTransfer.getData('text/html');
+        dragSrcEl.parentElement.innerHTML = e.currentTarget.parentElement.innerHTML;
+        e.currentTarget.parentElement.innerHTML = e.dataTransfer.getData('text/html');
       }
 
       return false;
     }
     //triggers if you let go of the mouse ontop of a draggable item
     function handleThumbDrop(e) {
-      $(this).parent('.thumb_wrap').removeClass('dragover');
+      $(e.currentTarget).parent('.thumb_wrap').removeClass('dragover');
       if (e.stopPropagation) {
         e.stopPropagation(); // Stops some browsers from redirecting.
       }
 
       // Don't do anything if dropping the same column we're dragging.
-      if (dragSrcEl != this) {
+      if (dragSrcEl != e.currentTarget) {
         //move element to before position of destination
-        var new_thumb = $(e.dataTransfer.getData('text/html')).insertBefore(this.parentElement);
+        var new_thumb = $(e.dataTransfer.getData('text/html')).insertBefore(e.currentTarget.parentElement);
         dragSrcEl.dropped = true; //set if element has been dropped on a droppable item
         new_thumb.find('.config_screen .margins_wrap .top').val(dragSrcElmargins.t);
         new_thumb.find('.config_screen .margins_wrap .bottom').val(dragSrcElmargins.b);
@@ -625,7 +634,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
         });
       });
 
-      var thumb_wrap = $('.thumb_wrap');
+      thumb_wrap = $('.thumb_wrap');
       thumb_wrap.each(function(i) {
         $(this).find('.thumb_crop .opt_wrap.remove button').each(function() {
           var btn = $(this);
@@ -654,7 +663,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
         });
 
         resplice_btn.on('click', function () {
-          $(thumb).data('splice', '')
+          $(thumb).data('splice', '');
           resplice($(thumb).data('timestamp'));
           $(thumb).find('.margins_wrap').toggleClass('hidden');
         });
@@ -716,7 +725,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
             $('.redline_wrap').on('click mouseout mouseup',function (e) {
               e.stopPropagation();
             }).drags();
-          }
+          };
         });
       });
     }
@@ -734,10 +743,10 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
 
       //remove modals when done
       $('.spliceModal').remove();
-    };
+    }
     function killDrags(e){
       e.stopPropagation();
-      $('.draggable').removeClass('draggable')
+      $('.draggable').removeClass('draggable');
     }
 
 

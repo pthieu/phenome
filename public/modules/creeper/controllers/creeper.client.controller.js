@@ -1,4 +1,5 @@
 'use strict';
+/*global $*/
 
 angular.module('creeper').controller('CreeperController', ['$scope',
   function($scope) {
