@@ -108,6 +108,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 	}
 ]);
 'use strict';
+/*global $*/
 
 angular.module('core').directive('fileUpload', [
   function() {
@@ -120,8 +121,8 @@ angular.module('core').directive('fileUpload', [
       scope: {
         'imgList': '='
       },
-      link: function postLink(scope, element, attrs) {
-        scope.imgList = ['hi'];
+      link: function postLink($scope, element, attrs) {
+        $scope.imgList = [];
 
         function handleFileDrop(e) {
           e.stopPropagation();
@@ -134,7 +135,7 @@ angular.module('core').directive('fileUpload', [
           if (!!e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
 
           var filesRAW;
-          // $(this).removeClass('blueborder');
+          $(e.currentTarget).removeClass('blueborder');
 
           // Check if user performed drag and drop or button click for upload
           if (!!e.dataTransfer) {
@@ -146,98 +147,102 @@ angular.module('core').directive('fileUpload', [
           }
 
           function fileReaderDone(f) {
-              //we return an object because we want variable file to be in the scope of the function (as variable f)
-              return function(e) {
-                // docDefinition = {content:[{image: e.target.result,width: 150, height: 150}]}
-                // pdfMake.createPdf(docDefinition).download('test.pdf')
-                //we also want variable e to be the input parameter from ouput of readAsDataURL
-                // f['url'] = e.target.result;
-                // f['size'] = getImageSize(f.url);
-                // Convert src to window URL
-                // file['src'] = window.URL.createObjectURL(filesRAW[i]);
-                // Push the byte src into imgList variable, which is linked to the imgList variable outside of the fileUpload directive
-                // scope.imgList.push(e.target.result);
-                scope.imgList.push('done');
-                // f['size'] = getImageSize(f.url);
+            //we return an object because we want variable file to be in the scope of the function (as variable f)
+            return function(e) {
+              // docDefinition = {content:[{image: e.target.result,width: 150, height: 150}]}
+              // pdfMake.createPdf(docDefinition).download('test.pdf')
+              //we also want variable e to be the input parameter from ouput of readAsDataURL
+              // f['url'] = e.target.result;
+              // f['size'] = getImageSize(f.url);
+              // Convert src to window URL
+              // file['src'] = window.URL.createObjectURL(filesRAW[i]);
+              // Push the byte src into imgList variable, which is linked to the imgList variable outside of the fileUpload directive
+              $scope.imgList.push({
+                'name': f.name,
+                'extension': f.extension,
+                'src': e.target.result
+              });
+              $scope.$apply();
+              // f['size'] = getImageSize(f.url);
 
-                // var fullsize = JSON.stringify({'w':f.size.width, 'h':f.size.height});
-                // Calculate landscape or portrait using w/h ratios, if return false, then image size 0x0
-                // var imgRatio = calcRatio(f.size.width, f.size.height);
-                // if (!imgRatio) return;
+              // var fullsize = JSON.stringify({'w':f.size.width, 'h':f.size.height});
+              // Calculate landscape or portrait using w/h ratios, if return false, then image size 0x0
+              // var imgRatio = calcRatio(f.size.width, f.size.height);
+              // if (!imgRatio) return;
 
-                // f['crop'] = imgRatio[0]; //number of screens there are (number rounded up)
-                // f['max_h'] = imgRatio[1]; //max height screen can be (includes margins)
+              // f['crop'] = imgRatio[0]; //number of screens there are (number rounded up)
+              // f['max_h'] = imgRatio[1]; //max height screen can be (includes margins)
 
-                // Generate the preview panels
-                // var config_screen = [
-                //     "<div class='fileinfo'>" + f.name + "</div>",
-                //     "<div class='config_screen'>",
-                //       // "<div class='opt_wrap remove'>",
-                //       //   "<button title='Remove from PDF'><i class='fa fa-times'></i></button>",
-                //       //   "<span>Remove</span>",
-                //       // "</div>",
-                //       "<div class='opt_wrap margin_btn'>",
-                //         "<button title='Set custom margins'><i class='fa fa-arrows-alt'></i></button>",
-                //         "<span>Margins</span>",
-                //       "</div>",
-                //       "<div class='opt_wrap preview'>",
-                //         "<button title='Splice image by dragging red lines'><i class='fa fa-search-plus'></i></button>",
-                //         "<span>Splicer</span>",
-                //       "</div>",
-                //       "<div class='margins_wrap hidden'>",
-                //         "<div class='margins'>",
-                //           "<div class='margin msg'>",
-                //             "<span style='font-style:italic'>Close menu to drag again</span>",
-                //           "</div>",
-                //           "<div class='margin msg'>",
-                //             "<span style='font-style:italic'>(Units in inches)</span>",
-                //           "</div>",
-                //           "<div class='margin'>",
-                //             "<label>Top:</label><input class='top' />",
-                //           "</div>",
-                //           "<div class='margin hidden'>",
-                //             "<label>Bottom:</label><input class='bottom' />",
-                //           "</div>",
-                //           "<div class='margin'>",
-                //             "<label>Left:</label><input class='left' />",
-                //           "</div>",
-                //           "<div class='margin'>",
-                //             "<label>Right:</label><input class='right' />",
-                //           "</div>",
-                //           "<div class='margin msg'>",
-                //             "<span style='font-style:italic'>Input numbers only!</span>",
-                //           "</div>",
-                //           "<div class='margin'>",
-                //             "<button class='resplice_btn'>Re-splice</button>",
-                //           "</div>",
-                //         "</div>",
-                //       "</div>",
-                //     "</div>"
-                //   ].join('');
+              // Generate the preview panels
+              // var config_screen = [
+              //     "<div class='fileinfo'>" + f.name + "</div>",
+              //     "<div class='config_screen'>",
+              //       // "<div class='opt_wrap remove'>",
+              //       //   "<button title='Remove from PDF'><i class='fa fa-times'></i></button>",
+              //       //   "<span>Remove</span>",
+              //       // "</div>",
+              //       "<div class='opt_wrap margin_btn'>",
+              //         "<button title='Set custom margins'><i class='fa fa-arrows-alt'></i></button>",
+              //         "<span>Margins</span>",
+              //       "</div>",
+              //       "<div class='opt_wrap preview'>",
+              //         "<button title='Splice image by dragging red lines'><i class='fa fa-search-plus'></i></button>",
+              //         "<span>Splicer</span>",
+              //       "</div>",
+              //       "<div class='margins_wrap hidden'>",
+              //         "<div class='margins'>",
+              //           "<div class='margin msg'>",
+              //             "<span style='font-style:italic'>Close menu to drag again</span>",
+              //           "</div>",
+              //           "<div class='margin msg'>",
+              //             "<span style='font-style:italic'>(Units in inches)</span>",
+              //           "</div>",
+              //           "<div class='margin'>",
+              //             "<label>Top:</label><input class='top' />",
+              //           "</div>",
+              //           "<div class='margin hidden'>",
+              //             "<label>Bottom:</label><input class='bottom' />",
+              //           "</div>",
+              //           "<div class='margin'>",
+              //             "<label>Left:</label><input class='left' />",
+              //           "</div>",
+              //           "<div class='margin'>",
+              //             "<label>Right:</label><input class='right' />",
+              //           "</div>",
+              //           "<div class='margin msg'>",
+              //             "<span style='font-style:italic'>Input numbers only!</span>",
+              //           "</div>",
+              //           "<div class='margin'>",
+              //             "<button class='resplice_btn'>Re-splice</button>",
+              //           "</div>",
+              //         "</div>",
+              //       "</div>",
+              //     "</div>"
+              //   ].join('');
 
-                // I believe we commented out conditional statement because we will add a timestamp for every single image uploaded regardless of crop size
-                // if (f.crop > 1) {
+              // I believe we commented out conditional statement because we will add a timestamp for every single image uploaded regardless of crop size
+              // if (f.crop > 1) {
 
-                //use time stamp to get unique group identifier
-                // var timestamp = (new Date()).getTime();
-                //write to canvas and split into however many sections
-                // splitCanvas(e.target.result, timestamp);
-                //splitCanvas has async calls so we have to add a div group skeleton and fill it up later
-                // var addIMG = ["<div class='thumb_wrap crop_group ", timestamp,
-                  // "' data-src='" + f.src + "' data-fullsize='" + fullsize + "' data-timestamp='" + timestamp + "'><div draggable='true' class='drag_overlay'></div>",
-                  // config_screen, "</div>"
-                // ].join('');
-                // }
-                // else {
-                //   //append image to div -- single page no crop isn't an async call so just add it
-                //   var addIMG = ["<div class='thumb_wrap' data-src='"+f.src+"'><div draggable='true' class='drag_overlay'></div>" + config_screen + "<div class='thumb_crop'><div class='opt_wrap remove'><button title='Remove from PDF'><i class='fa fa-times'></i></button></div><div class='bg_cross'></div><span><img src='", f.url, "' class='thumb' /></span></div></div>"].join('');
-                //   rebindConfig();
-                // }
-                // $('#list').append(addIMG);
+              //use time stamp to get unique group identifier
+              // var timestamp = (new Date()).getTime();
+              //write to canvas and split into however many sections
+              // splitCanvas(e.target.result, timestamp);
+              //splitCanvas has async calls so we have to add a div group skeleton and fill it up later
+              // var addIMG = ["<div class='thumb_wrap crop_group ", timestamp,
+              // "' data-src='" + f.src + "' data-fullsize='" + fullsize + "' data-timestamp='" + timestamp + "'><div draggable='true' class='drag_overlay'></div>",
+              // config_screen, "</div>"
+              // ].join('');
+              // }
+              // else {
+              //   //append image to div -- single page no crop isn't an async call so just add it
+              //   var addIMG = ["<div class='thumb_wrap' data-src='"+f.src+"'><div draggable='true' class='drag_overlay'></div>" + config_screen + "<div class='thumb_crop'><div class='opt_wrap remove'><button title='Remove from PDF'><i class='fa fa-times'></i></button></div><div class='bg_cross'></div><span><img src='", f.url, "' class='thumb' /></span></div></div>"].join('');
+              //   rebindConfig();
+              // }
+              // $('#list').append(addIMG);
 
-                // rebindThumbHandlers();
-              };
-            }
+              // rebindThumbHandlers();
+            };
+          }
 
           // Check the type of each uploaded file, we only care if it's an image file
           for (var i = 0; i < filesRAW.length; i++) {
@@ -249,7 +254,8 @@ angular.module('core').directive('fileUpload', [
             var reader = new FileReader();
             var file = {};
 
-            // file['name'] = filesRAW[i].name;
+            file.name = filesRAW[i].name.substr(0, filesRAW[i].name.lastIndexOf('.')) || filesRAW[i].name;
+            file.extension = filesRAW[i].type.replace(/image\//, '');
             // file['type'] = filesRAW[i].type;
             // file['src'] = window.URL.createObjectURL(filesRAW[i]);
 
@@ -262,11 +268,24 @@ angular.module('core').directive('fileUpload', [
           }
         }
 
+        function handleDragOver(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          $(e.currentTarget).addClass('blueborder');
+          e.dataTransfer.dropEffect = 'copy'; // Explicitly show this isrt('test')
+        }
+
+        function handleDragLeave(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          $(e.currentTarget).removeClass('blueborder');
+        }
+
         var dropZone = document.getElementsByClassName('dropzone')[0];
-        // dropZone.addEventListener('dragover', handleDragOver, false);
-        // dropZone.addEventListener('dragleave', handleDragLeave, false);
-        dropZone.addEventListener('drop', handleFileDrop, false);
-        dropZone.addEventListener('change', handleFileDrop, false);
+        dropZone.addEventListener('dragover', handleDragOver.bind(dropZone), false);
+        dropZone.addEventListener('dragleave', handleDragLeave.bind(dropZone), false);
+        dropZone.addEventListener('drop', handleFileDrop.bind(dropZone), false);
+        dropZone.addEventListener('change', handleFileDrop.bind(dropZone), false);
       }
     };
   }
@@ -622,14 +641,106 @@ angular.module('imgtouch').config(['$stateProvider',
 // We don't declare it here because we have already required our declarations for anything in the 'core' module
 angular.module('imgtouch').controller('ImgtouchController', ['$scope',
   function($scope) {
+    /*global $*/ //this tells jshint that we assume jquery to exist
     // Controller Logic
-    setInterval(function () {
-      console.log($scope.imgList);
-    },1000);
 
-    $scope.watch('imgList', function () {
-      // $scope.apply();
-    });
+    // Wrapper function, interfaces with UI, doesn't actually do any of the logic, just sets it up
+    $scope.downloadAll = function(files) {
+      //reset depth count
+      $scope.downloadDepth = 0;
+
+      // Since we are using files as a model to handle our view, we copy it to another array to handle the data maniuplation
+      // to keep the initial dataset clean
+      var downloadFiles = files.slice(0);
+      handleDownloadAll(downloadFiles);
+    };
+
+    // Actual logic for downloading all files that have been uploaded to the app
+    function handleDownloadAll(files) {
+      // If we don't detect any files, go up a depth in the recursion, will end recursion if depth highest
+      if (files.length === 0) return;
+      var file = files.pop();
+
+      // Create a new image object to load our image data into
+      var img = new Image();
+      img.onload = function() {
+        // After data has been loaded, we can do stuff, i.e. add buffer pixels to top of image
+        // Create canvas object first, we don't need to create a canvas in HTML and refer to that because that
+        // is stupid. We can do it in code, reference it, and remove it, without any way for the user to see
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+
+        // NOTE THAT BELOW WAS OLD LOGIC
+        // Resize the canvas to the size of the image
+        // canvas.width = img.width;
+        // canvas.height = img.height + parseInt($scope.topbuffer.h || 0);
+        // // If there is buffer pixels specified, we add it
+        // ctx.rect(0, 0, img.width, $scope.topbuffer.h || 0);
+        // ctx.fillStyle = 'black';
+        // ctx.fill();
+        // // Fill image in after top buffer has been placed
+        // ctx.drawImage(img, 0, $scope.topbuffer.h || 0); // Or at whatever offset you like
+        // END OLD LOGIC
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        // Fill image in after top buffer has been placed
+        ctx.drawImage(img, 0, 0); // Or at whatever offset you like
+        canvas = splitImage(canvas, $scope.topbuffer.y, $scope.topbuffer.h);
+        // Create temporary anchor element, bind src, download and remove
+        var theAnchor = $('<a />')
+          .attr('href', canvas.toDataURL())
+          // .attr('download', (img.name || 'file') + img.depth);
+          .attr('download', (img.name || 'file') + '_touched.' + img.extension);
+        theAnchor[0].click();
+        theAnchor.remove();
+      };
+      // Here we save the depth as a property of the image object because the onload event is asynchronous
+      // so we need a way to refer to it when it actually loads.
+      img.depth = $scope.downloadDepth;
+      // Load the file
+      img.name = file.name;
+      img.extension = file.extension;
+      img.src = file.src;
+
+      // Increment the depth and go deeper into the recursive algorithm
+      $scope.downloadDepth++;
+      handleDownloadAll(files); // WE MUST GO DEEPER
+    }
+
+    function splitImage(_canvas, _y, _h) {
+      // NOTE: THIS ISN'T DOING ANY CHECKS ON PARAMETERS PASSED IN. COULD BREAK IF _y or _h GREATER THAN HEIGHT OF _canvas/canvas
+
+      // Assuming just one split, two parts
+      // Create new canvas with new height, we are going to return this one after making modifications
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('2d');
+      // Height of modified canvas is old canvas plus the amount of pixels we're adding
+      canvas.height = _canvas.height + _h;
+      canvas.width = _canvas.width;
+      // Paint top part of old canvas old canvas onto new canvas
+      // drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
+      // img: can be image object or other canvas
+      // sx/sy: starting x/y positions to clip from source
+      // swidth/sheight: w/h to clip from starting location
+      // x/y: starting location of destination canvas
+      // width/height: where to copy clipped src to, will stretch or shrink src
+
+      // Clip out top part of old canvas, draw it on new one
+      ctx.drawImage(_canvas, 0, 0, _canvas.width, _y, 0, 0, canvas.width, _y);
+      // Clip out bottom part of canvas, drop it on new one a specific _h away from top part
+      // Clip clip whole width of old canvas(sx=0, swidth=_canvas.width), clip height from start of cut to end (sy=_y, sheight=_canvas.height-_y), note that old canvas doesn't have added pixels
+      // Copy to new canvas's location after added pixels (x=0, y=_y+_h), copy to whole width of new canvas(width=canvas.width, height=_canvas.height-_y)
+      ctx.drawImage(_canvas, 0, _y, _canvas.width, _canvas.height - _y, 0, _y + _h, canvas.width, _canvas.height - _y);
+
+      // Add the buffer pixels to the proper section
+      ctx.rect(0, _y, canvas.width, _h);
+      ctx.fillStyle = 'black';
+      ctx.fill();
+
+      // Return the new canvas so that we can download it
+      return canvas;
+    }
   }
 ]);
 
@@ -900,7 +1011,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
         'height': img.height
       };
 
-      delete img;
+      // delete img;
       return size;
     }
 

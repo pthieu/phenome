@@ -252,7 +252,7 @@ angular.module('pdfstitcher').controller('PdfstitcherController', ['$scope',
         'height': img.height
       };
 
-      delete img;
+      // delete img;
       return size;
     }
 

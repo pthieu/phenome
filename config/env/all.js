@@ -6,7 +6,7 @@ module.exports = {
 		description: 'Phong\'s enhancement suite for Genome',
 		keywords: 'Genome, enhancement, Phong, phenome, MEAN.js'
 	},
-	port: process.env.PORT || 3000,
+	port: process.env.PORT || 1337,
 	templateEngine: 'swig',
 	sessionSecret: 'MEAN',
 	sessionCollection: 'sessions',
