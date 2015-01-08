@@ -1,1 +1,1 @@
-forever stop ~/www/phenome/app.js
+forever stop ~/www/phenome/server.js
